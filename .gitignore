@@ -1,0 +1,4 @@
+.cache.yaml
+node_modules/
+dist/
+.env

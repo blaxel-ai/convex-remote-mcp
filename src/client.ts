@@ -41,11 +41,6 @@ export async function convexFetch<TResponse = unknown, TBody = unknown>(options:
     timeoutMs = 30000,
   } = options;
 
-  const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN;
-  if (!adminAccessToken || adminAccessToken.trim().length === 0) {
-    throw new Error("ADMIN_ACCESS_TOKEN environment variable is required");
-  }
-
   const url = buildUrl(baseUrl, path, query);
 
   const controller = new AbortController();
@@ -55,7 +50,6 @@ export async function convexFetch<TResponse = unknown, TBody = unknown>(options:
     method,
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Convex ${adminAccessToken}`,
       ...(headers ?? {}),
     },
     signal: controller.signal,

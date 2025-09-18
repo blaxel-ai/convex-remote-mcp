@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getUrl } from "../utils";
+import { getHeaders, getUrl } from "../utils";
 
 const inputSchema = {};
 
@@ -18,7 +18,7 @@ export const registerTables = (server: McpServer) => {
     },
     async (_args, { _meta }) => {
       const baseUrl = getUrl(_meta);
-
+      const headers = getHeaders(_meta)
       // Fetch declared (active) schema via system function
       const { data: schemaResponse } = await convexFetch<any, any>({
         baseUrl,
@@ -28,6 +28,7 @@ export const registerTables = (server: McpServer) => {
           path: "_system/frontend/getSchemas",
           args: {},
         },
+        headers,
       });
 
       const declaredSchema: Record<string, any> = {};
@@ -56,6 +57,7 @@ export const registerTables = (server: McpServer) => {
         baseUrl,
         method: "GET",
         path: "/api/shapes2",
+        headers,
       });
 
       const allTables = Array.from(

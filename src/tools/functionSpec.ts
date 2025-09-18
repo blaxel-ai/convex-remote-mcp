@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { convexFetch } from "../client";
-import { getUrl } from "../utils";
+import { getHeaders, getUrl } from "../utils";
 
 const inputSchema = {};
 
@@ -17,6 +17,7 @@ export const registerFunctionSpec = (server: McpServer) => {
     },
     async (_args, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -25,6 +26,7 @@ export const registerFunctionSpec = (server: McpServer) => {
           path: "_system/cli/modules:apiSpec",
           args: {},
         },
+        headers,
       });
       return {
         content: [{ type: "text", text: JSON.stringify(data) }],

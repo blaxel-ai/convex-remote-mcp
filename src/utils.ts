@@ -23,3 +23,19 @@ export function getUrl(meta: RequestMeta): string {
   const deploymentName = getDeploymentName(meta)
   return `https://${deploymentName}.convex.cloud`
 }
+
+export function getHeaders(meta: RequestMeta): Record<string, string> {
+  const headers = {}
+  const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN;
+  console.error(meta)
+  if (meta?.deploymentKey) {
+    headers["Authorization"] = `Convex ${meta.deploymentKey}`
+  } else if (process.env.DEPLOYMENT_KEY) {
+    headers["Authorization"] = `Convex ${process.env.DEPLOYMENT_KEY}`
+  } else if (adminAccessToken) {
+    headers["Authorization"] = `Convex ${adminAccessToken}`
+  } else {
+    throw new Error("ADMIN_ACCESS_TOKEN or DEPLOYMENT_KEY environment variable is required");
+  }
+  return headers
+}

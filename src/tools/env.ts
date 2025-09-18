@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getUrl } from "../utils";
+import { getHeaders, getUrl } from "../utils";
 
 const listInput = {};
 const getInput = {
@@ -22,6 +22,7 @@ export const registerEnv = (server: McpServer) => {
     { description: "List environment variables", inputSchema: listInput },
     async (_args, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -30,6 +31,7 @@ export const registerEnv = (server: McpServer) => {
           path: "_system/cli/queryEnvironmentVariables",
           args: {},
         },
+        headers,
       });
       return { content: [{ type: "text", text: JSON.stringify({ variables: data }) }], isError: false };
     },
@@ -41,6 +43,7 @@ export const registerEnv = (server: McpServer) => {
     { description: "Get an environment variable", inputSchema: getInput },
     async ({ name }, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -49,6 +52,7 @@ export const registerEnv = (server: McpServer) => {
           path: "_system/cli/queryEnvironmentVariables:get",
           args: { name },
         },
+        headers,
       });
       return { content: [{ type: "text", text: JSON.stringify({ value: data?.value ?? null }) }], isError: false };
     },
@@ -60,6 +64,7 @@ export const registerEnv = (server: McpServer) => {
     { description: "Set an environment variable", inputSchema: setInput },
     async ({ name, value }, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -68,6 +73,7 @@ export const registerEnv = (server: McpServer) => {
           path: "_system/cli/environment:set",
           args: { name, value },
         },
+        headers,
       });
       const success = !(data && data.status === "error");
       return { content: [{ type: "text", text: JSON.stringify({ success }) }], isError: !success };
@@ -80,6 +86,7 @@ export const registerEnv = (server: McpServer) => {
     { description: "Remove an environment variable", inputSchema: removeInput },
     async ({ name }, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -88,6 +95,7 @@ export const registerEnv = (server: McpServer) => {
           path: "_system/cli/environment:remove",
           args: { name },
         },
+        headers,
       });
       const success = !(data && data.status === "error");
       return { content: [{ type: "text", text: JSON.stringify({ success }) }], isError: !success };

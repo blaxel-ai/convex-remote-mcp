@@ -1,6 +1,6 @@
 import { FunctionSchema } from "@blaxel/core";
-import { schemaToZodSchema } from "@blaxel/core/tools/zodSchema";
 import { Client } from "@modelcontextprotocol/sdk/client";
+import { schemaToZodSchema } from "./schemaToZodSchema";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { tool } from "ai";
 import dotenv from "dotenv";

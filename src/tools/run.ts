@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getUrl } from "../utils";
+import { getHeaders, getUrl } from "../utils";
 
 const inputSchema = {
   functionName: z
@@ -26,6 +26,7 @@ export const registerRun = (server: McpServer) => {
     },
     async ({ functionName, args }, { _meta }) => {
       const baseUrl = getUrl(_meta);
+      const headers = getHeaders(_meta)
       const body = {
         path: functionName,
         args: args ?? {},
@@ -35,6 +36,7 @@ export const registerRun = (server: McpServer) => {
         method: "POST",
         path: "/api/function",
         body,
+        headers,
       });
       return {
         content: [{ type: "text", text: JSON.stringify({ result: data?.value }) }],

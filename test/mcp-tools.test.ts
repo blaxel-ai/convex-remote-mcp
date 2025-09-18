@@ -16,7 +16,7 @@ const TOOL_NAMES = [
 
 describe("MCP tools", () => {
   it("exposes all expected tools", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: "test" });
+    const { tools, close } = await initMCPClient({ deploymentName: "test" });
     const names = Object.keys(tools);
     for (const name of TOOL_NAMES) {
       expect(names).toContain(name);
@@ -24,7 +24,7 @@ describe("MCP tools", () => {
     await close();
   }, 30000);
 
-  it("raises error without deployment selector for tools that require it", async () => {
+  it("raises error without deployment name for tools that require it", async () => {
     const { tools, close } = await initMCPClient({});
     const toolsToCheck = {
       data: {
@@ -68,7 +68,7 @@ describe("MCP tools", () => {
   }, 45000);
 
   it("tables lists schemas", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: process.env.DEPLOYMENT_SELECTOR! });
+    const { tools, close } = await initMCPClient({ deploymentName: process.env.DEPLOYMENT_NAME! });
     const result = await tools["tables"].execute({});
     console.log(result);
     expect(result.isError).toBe(false);
@@ -76,7 +76,7 @@ describe("MCP tools", () => {
   }, 30000);
 
   it("functionSpec returns metadata", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: process.env.DEPLOYMENT_SELECTOR! });
+    const { tools, close } = await initMCPClient({ deploymentName: process.env.DEPLOYMENT_NAME! });
     const result = await tools["functionSpec"].execute({});
     console.log(result);
     expect(result.isError).toBe(false);
@@ -84,7 +84,7 @@ describe("MCP tools", () => {
   }, 30000);
 
   it("logs returns entries and newCursor", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: process.env.DEPLOYMENT_SELECTOR! });
+    const { tools, close } = await initMCPClient({ deploymentName: process.env.DEPLOYMENT_NAME! });
     const result = await tools["logs"].execute({ limit: 1 });
     console.log(result);
     expect(result.isError).toBe(false);
@@ -92,7 +92,7 @@ describe("MCP tools", () => {
   }, 30000);
 
   it("envList returns variables", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: process.env.DEPLOYMENT_SELECTOR! });
+    const { tools, close } = await initMCPClient({ deploymentName: process.env.DEPLOYMENT_NAME! });
     const result = await tools["envList"].execute({});
     console.log(result);
     expect(result.isError).toBe(false);
@@ -100,7 +100,7 @@ describe("MCP tools", () => {
   }, 30000);
 
   it("runOneoffQuery executes a readonly query", async () => {
-    const { tools, close } = await initMCPClient({ deploymentSelector: process.env.DEPLOYMENT_SELECTOR! });
+    const { tools, close } = await initMCPClient({ deploymentName: process.env.DEPLOYMENT_NAME! });
     const source = [
       'import { query } from "convex:/_system/repl/wrappers.js";',
       "export default query({",

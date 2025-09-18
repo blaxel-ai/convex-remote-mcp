@@ -27,7 +27,6 @@ export function getUrl(meta: RequestMeta): string {
 export function getHeaders(meta: RequestMeta): Record<string, string> {
   const headers = {}
   const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN;
-  console.error(meta)
   if (meta?.deploymentKey) {
     headers["Authorization"] = `Convex ${meta.deploymentKey}`
   } else if (process.env.DEPLOYMENT_KEY) {

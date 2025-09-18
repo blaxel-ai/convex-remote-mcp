@@ -73,7 +73,6 @@ describe("MCP tools", () => {
   it("tables lists schemas", async () => {
     const { tools, close } = await initMCPClient({ deploymentName });
     const result = await tools["tables"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -81,7 +80,6 @@ describe("MCP tools", () => {
   it("functionSpec returns metadata", async () => {
     const { tools, close } = await initMCPClient({ deploymentName });
     const result = await tools["functionSpec"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -89,7 +87,6 @@ describe("MCP tools", () => {
   it("logs returns entries and newCursor", async () => {
     const { tools, close } = await initMCPClient({ deploymentName });
     const result = await tools["logs"].execute({ limit: 1 });
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -97,7 +94,6 @@ describe("MCP tools", () => {
   it("envList returns variables", async () => {
     const { tools, close } = await initMCPClient({ deploymentName });
     const result = await tools["envList"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -113,17 +109,14 @@ describe("MCP tools", () => {
       "});",
     ].join("\n");
     const result = await tools["runOneoffQuery"].execute({ query: source });
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 45000);
 
   it("tables lists schemas with deployment key", async () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
-    console.log(deploymentName, deploymentKey);
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["tables"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -136,7 +129,6 @@ describe("MCP tools", () => {
       order: "asc",
       limit: 1
     });
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -145,7 +137,6 @@ describe("MCP tools", () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["functionSpec"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -154,7 +145,6 @@ describe("MCP tools", () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["logs"].execute({ limit: 1 });
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -163,7 +153,6 @@ describe("MCP tools", () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["envList"].execute({});
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -172,7 +161,6 @@ describe("MCP tools", () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["envGet"].execute({ name: "TEST_VAR" });
-    console.log(result);
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -184,7 +172,6 @@ describe("MCP tools", () => {
       name: "TEST_VAR_MCP",
       value: "test_value"
     });
-    console.log(result);
     // Should fail as envSet mutations require admin access
     expect(result.isError).toBe(true);
     await close();
@@ -194,7 +181,6 @@ describe("MCP tools", () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     const result = await tools["envRemove"].execute({ name: "TEST_VAR_MCP" });
-    console.log(result);
     // Should fail as envRemove mutations require admin access
     expect(result.isError).toBe(true);
     await close();
@@ -208,7 +194,6 @@ describe("MCP tools", () => {
       functionName: "_system/cli/queryEnvironmentVariables",
       args: {}
     });
-    console.log(result);
     // Should fail as system functions require admin access
     expect(result.isError).toBe(true);
     await close();
@@ -226,7 +211,6 @@ describe("MCP tools", () => {
       "});",
     ].join("\n");
     const result = await tools["runOneoffQuery"].execute({ query: source });
-    console.log(result);
     // Should fail as oneoff queries require admin key
     expect(result.isError).toBe(true);
     await close();

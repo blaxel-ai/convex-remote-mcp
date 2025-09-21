@@ -68,10 +68,12 @@ export const registerEnv = (server: McpServer) => {
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
-        path: "/api/mutation",
+        path: "/api/update_environment_variables",
         body: {
-          path: "_system/cli/environment:set",
-          args: { name, value },
+          changes: [{
+            name,
+            value,
+          }]
         },
         headers,
       });
@@ -90,10 +92,11 @@ export const registerEnv = (server: McpServer) => {
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
-        path: "/api/mutation",
+        path: "/api/update_environment_variables",
         body: {
-          path: "_system/cli/environment:remove",
-          args: { name },
+          changes: [{
+            name,
+          }]
         },
         headers,
       });

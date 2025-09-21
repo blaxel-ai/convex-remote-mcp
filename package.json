@@ -15,6 +15,7 @@
     "@blaxel/core": "0.2.37",
     "@blaxel/telemetry": "0.2.37",
     "@modelcontextprotocol/sdk": "^1.17.5",
+    "convex": "^1.27.1",
     "dotenv": "^17.2.2",
     "uuid": "^11.1.0",
     "ws": "^8.18.2",

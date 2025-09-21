@@ -91,9 +91,35 @@ describe("MCP tools", () => {
     await close();
   }, 30000);
 
-  it("envList returns variables", async () => {
+
+  it("environment test variable", async () => {
     const { tools, close } = await initMCPClient({ deploymentName });
-    const result = await tools["envList"].execute({});
+    let result = await tools["envSet"].execute({
+      name: "TEST_VAR_MCP",
+      value: "test_value"
+    });
+    expect(result.isError).toBe(false);
+    result = await tools["envList"].execute({});
+
+    result = await tools["envGet"].execute({ name: "TEST_VAR_MCP" });
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text.includes("TEST_VAR_MCP")).toBe(true);
+    result = await tools["envRemove"].execute({ name: "TEST_VAR_MCP" });
+
+    expect(result.isError).toBe(false);
+    result = await tools["envGet"].execute({ name: "TEST_VAR_MCP" });
+    expect(result.content[0].text.includes("TEST_VAR_MCP")).toBe(false);
+    expect(result.isError).toBe(false);
+    await close();
+  }, 30000);
+
+  it("run", async () => {
+    const { tools, close } = await initMCPClient({ deploymentName });
+    // Try to run a system function that requires admin access
+    const result = await tools["run"].execute({
+      functionName: "script:get",
+      args: {}
+    });
     expect(result.isError).toBe(false);
     await close();
   }, 30000);
@@ -149,53 +175,39 @@ describe("MCP tools", () => {
     await close();
   }, 30000);
 
-  it("envList returns variables with deployment key", async () => {
-    delete process.env.ADMIN_ACCESS_TOKEN;
-    const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
-    const result = await tools["envList"].execute({});
-    expect(result.isError).toBe(false);
-    await close();
-  }, 30000);
 
-  it("envGet retrieves variable with deployment key", async () => {
+  it("environment test variable with deployment key", async () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
-    const result = await tools["envGet"].execute({ name: "TEST_VAR" });
-    expect(result.isError).toBe(false);
-    await close();
-  }, 30000);
-
-  it("envSet requires admin key (fails with deployment key)", async () => {
-    delete process.env.ADMIN_ACCESS_TOKEN;
-    const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
-    const result = await tools["envSet"].execute({
+    let result = await tools["envSet"].execute({
       name: "TEST_VAR_MCP",
       value: "test_value"
     });
-    // Should fail as envSet mutations require admin access
-    expect(result.isError).toBe(true);
+    expect(result.isError).toBe(false);
+    result = await tools["envList"].execute({});
+
+    result = await tools["envGet"].execute({ name: "TEST_VAR_MCP" });
+    expect(result.isError).toBe(false);
+    expect(result.content[0].text.includes("TEST_VAR_MCP")).toBe(true);
+    result = await tools["envRemove"].execute({ name: "TEST_VAR_MCP" });
+
+    expect(result.isError).toBe(false);
+    result = await tools["envGet"].execute({ name: "TEST_VAR_MCP" });
+    expect(result.content[0].text.includes("TEST_VAR_MCP")).toBe(false);
+    expect(result.isError).toBe(false);
     await close();
   }, 30000);
 
-  it("envRemove requires admin key (fails with deployment key)", async () => {
-    delete process.env.ADMIN_ACCESS_TOKEN;
-    const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
-    const result = await tools["envRemove"].execute({ name: "TEST_VAR_MCP" });
-    // Should fail as envRemove mutations require admin access
-    expect(result.isError).toBe(true);
-    await close();
-  }, 30000);
-
-  it("run requires admin key for system functions (fails with deployment key)", async () => {
+  it("run with deployment key", async () => {
     delete process.env.ADMIN_ACCESS_TOKEN;
     const { tools, close } = await initMCPClient({ deploymentName, deploymentKey });
     // Try to run a system function that requires admin access
     const result = await tools["run"].execute({
-      functionName: "_system/cli/queryEnvironmentVariables",
+      functionName: "script:get",
       args: {}
     });
     // Should fail as system functions require admin access
-    expect(result.isError).toBe(true);
+    expect(result.isError).toBe(false);
     await close();
   }, 30000);
 

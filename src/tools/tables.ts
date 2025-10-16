@@ -16,9 +16,9 @@ export const registerTables = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async (_args, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async (_args, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo);
       // Fetch declared (active) schema via system function
       const { data: schemaResponse } = await convexFetch<any, any>({
         baseUrl,

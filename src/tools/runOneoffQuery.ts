@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { getHeaders, getUrl } from "../utils";
+import { getConfigValue, getHeaders, getUrl } from "../utils";
 
 const inputSchema = {
   query: z
@@ -19,14 +19,19 @@ export const registerRunOneoffQuery = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ query }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ query }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo);
       const response = await fetch(`${baseUrl}/api/run_test_function`, {
         method: "POST",
         headers: { "Content-Type": "application/json", ...headers  },
         body: JSON.stringify({
-          adminKey: process.env.ADMIN_ACCESS_TOKEN,
+          adminKey: getConfigValue(
+            _meta?.adminKey,
+            "x-convex-admin-key",
+            "ADMIN_KEY",
+            headers
+          ),
           args: {},
           bundle: { path: "testQuery.js", source: query },
           format: "convex_encoded_json",

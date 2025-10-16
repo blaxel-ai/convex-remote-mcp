@@ -24,9 +24,9 @@ export const registerRun = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ functionName, args }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ functionName, args }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo);
       const body = {
         path: functionName,
         args: args ?? {},

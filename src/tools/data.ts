@@ -30,9 +30,9 @@ export const registerData = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ tableName, order, cursor, limit }, { _meta }) => {
-      const baseUrl = getUrl(_meta)
-      const headers = getHeaders(_meta)
+    async ({ tableName, order, cursor, limit }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo)
+      const headers = getHeaders(_meta, requestInfo)
       const args = {
         table: tableName,
         order: order,

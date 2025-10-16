@@ -1,40 +1,92 @@
-import { RequestMeta } from "@modelcontextprotocol/sdk/types.js"
+import { IsomorphicHeaders, RequestInfo, RequestMeta } from "@modelcontextprotocol/sdk/types.js"
 
-export function getDeploymentName(meta: RequestMeta ): string {
-  if (!meta?.deploymentName && !process.env.DEPLOYMENT_NAME) {
-    throw new Error("Deployment name not found")
+/**
+ * Helper function to get a value based on priority: meta > headers > env
+ */
+export function getConfigValue(
+  metaValue: any,
+  headerKey: string,
+  envKey: string,
+  headers: IsomorphicHeaders = {}
+): string | undefined {
+  console.log("getConfigValue", metaValue, headerKey, envKey, headers);
+  // Priority order: meta > headers > env
+  if (metaValue) {
+    return metaValue as string;
   }
-  if (meta?.deploymentName) {
-    return meta.deploymentName as string
+  if (headers[headerKey]) {
+    const headerValue = headers[headerKey];
+    // Handle both array and string formats
+    return Array.isArray(headerValue) ? headerValue[0] : headerValue;
   }
-  return process.env.DEPLOYMENT_NAME
+  if (process.env[envKey]) {
+    return process.env[envKey];
+  }
+  return undefined;
 }
 
-export function getUrl(meta: RequestMeta): string {
-  if (!meta?.deploymentName && !process.env.DEPLOYMENT_NAME) {
-    throw new Error("Deployment name not found")
+export function getDeploymentName(meta: RequestMeta, requestInfo: RequestInfo): string {
+  const headers = requestInfo?.headers ?? {};
+
+  const deploymentName = getConfigValue(
+    meta?.deploymentName,
+    "x-convex-deployment-name",
+    "DEPLOYMENT_NAME",
+    headers
+  );
+
+  if (!deploymentName) {
+    throw new Error("Deployment name not found");
   }
-  if (meta?.deploymentUrl) {
-    return meta.deploymentUrl as string
-  }
-  if (process.env.DEPLOYMENT_URL) {
-    return process.env.DEPLOYMENT_URL
-  }
-  const deploymentName = getDeploymentName(meta)
-  return `https://${deploymentName}.convex.cloud`
+
+  return deploymentName;
 }
 
-export function getHeaders(meta: RequestMeta): Record<string, string> {
-  const headers = {}
-  const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN;
-  if (meta?.deploymentKey) {
-    headers["Authorization"] = `Convex ${meta.deploymentKey}`
-  } else if (process.env.DEPLOYMENT_KEY) {
-    headers["Authorization"] = `Convex ${process.env.DEPLOYMENT_KEY}`
-  } else if (adminAccessToken) {
-    headers["Authorization"] = `Convex ${adminAccessToken}`
-  } else {
-    throw new Error("ADMIN_ACCESS_TOKEN or DEPLOYMENT_KEY environment variable is required");
+export function getUrl(meta: RequestMeta, requestInfo: RequestInfo): string {
+  const headers = requestInfo?.headers ?? {};
+
+  const url = getConfigValue(
+    meta?.deploymentUrl,
+    "x-convex-deployment-url",
+    "DEPLOYMENT_URL",
+    headers
+  );
+
+  if (url) {
+    return url;
   }
-  return headers
+
+  // Fallback: construct URL from deployment name
+  const deploymentName = getDeploymentName(meta, requestInfo);
+  return `https://${deploymentName}.convex.cloud`;
+}
+
+export function getHeaders(meta: RequestMeta, requestInfo: RequestInfo): Record<string, string> {
+  const requestHeaders = requestInfo?.headers ?? {};
+
+  // Try deployment key first
+  const deploymentKey = getConfigValue(
+    meta?.deploymentKey,
+    "x-convex-deployment-key",
+    "DEPLOYMENT_KEY",
+    requestHeaders
+  );
+
+  if (deploymentKey) {
+    return { Authorization: `Convex ${deploymentKey}` };
+  }
+
+  // Fallback to admin access token
+  const adminAccessToken = getConfigValue(
+    null,
+    "x-convex-admin-access-token",
+    "ADMIN_ACCESS_TOKEN",
+    requestHeaders
+  );
+
+  if (adminAccessToken) {
+    return { Authorization: `Convex ${adminAccessToken}` };
+  }
+
+  throw new Error("ADMIN_ACCESS_TOKEN or DEPLOYMENT_KEY environment variable is required");
 }

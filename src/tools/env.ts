@@ -20,9 +20,9 @@ export const registerEnv = (server: McpServer) => {
   server.registerTool(
     "envList",
     { description: "List environment variables", inputSchema: listInput },
-    async (_args, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async (_args, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -41,9 +41,9 @@ export const registerEnv = (server: McpServer) => {
   server.registerTool(
     "envGet",
     { description: "Get an environment variable", inputSchema: getInput },
-    async ({ name }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ name }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -62,9 +62,9 @@ export const registerEnv = (server: McpServer) => {
   server.registerTool(
     "envSet",
     { description: "Set an environment variable", inputSchema: setInput },
-    async ({ name, value }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ name, value }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",
@@ -86,9 +86,9 @@ export const registerEnv = (server: McpServer) => {
   server.registerTool(
     "envRemove",
     { description: "Remove an environment variable", inputSchema: removeInput },
-    async ({ name }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ name }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
         baseUrl,
         method: "POST",

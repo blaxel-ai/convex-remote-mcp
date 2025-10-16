@@ -28,9 +28,9 @@ export const registerLogs = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ cursor, limit }, { _meta }) => {
-      const baseUrl = getUrl(_meta);
-      const headers = getHeaders(_meta)
+    async ({ cursor, limit }, { _meta, requestInfo }) => {
+      const baseUrl = getUrl(_meta, requestInfo);
+      const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<{ entries: unknown[]; newCursor: number }>({
         baseUrl,
         method: "GET",

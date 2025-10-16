@@ -114,31 +114,31 @@ export function withToolMiddleware<TArgs extends Record<string, any>, TContext e
       span.setAttribute("tool.success", !result.isError);
       span.setAttribute("tool.duration_ms", duration);
 
-        console.log(`[MCP Tool] ${toolName} completed`, {
-          timestamp: new Date().toISOString(),
-          duration_ms: duration,
-          success: !result.isError,
-        });
+      console.log(`[MCP Tool] ${toolName} completed`, {
+        timestamp: new Date().toISOString(),
+        duration_ms: duration,
+        success: !result.isError,
+      });
 
-        span.end();
-        return result;
-      } catch (error) {
-        const duration = Date.now() - startTime;
+      span.end();
+      return result;
+    } catch (error) {
+      const duration = Date.now() - startTime;
 
-        span.recordException(error as Error);
-        span.setAttribute("tool.success", false);
-        span.setAttribute("tool.duration_ms", duration);
-        span.setAttribute("tool.error", (error as Error).message);
+      span.recordException(error as Error);
+      span.setAttribute("tool.success", false);
+      span.setAttribute("tool.duration_ms", duration);
+      span.setAttribute("tool.error", (error as Error).message);
 
-        console.error(`[MCP Tool] ${toolName} failed`, {
-          timestamp: new Date().toISOString(),
-          duration_ms: duration,
-          error: (error as Error).message,
-          stack: (error as Error).stack,
-        });
+      console.error(`[MCP Tool] ${toolName} failed`, {
+        timestamp: new Date().toISOString(),
+        duration_ms: duration,
+        error: (error as Error).message,
+        stack: (error as Error).stack,
+      });
 
-        span.end();
-        throw error;
-      }
+      span.end();
+      throw error;
+    }
   };
 }

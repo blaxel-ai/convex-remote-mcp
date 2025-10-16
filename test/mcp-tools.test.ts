@@ -14,8 +14,8 @@ const TOOL_NAMES = [
   "envRemove",
 ];
 
-const deploymentName = process.env.TEST_DEPLOYMENT_NAME;
-const deploymentKey = process.env.TEST_DEPLOYMENT_KEY;
+const deploymentName = process.env.TEST_DEPLOYMENT_NAME!;
+const deploymentKey = process.env.TEST_DEPLOYMENT_KEY!;
 
 describe("MCP tools", () => {
   it("exposes all expected tools", async () => {

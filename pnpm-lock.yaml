@@ -23,6 +23,9 @@ importers:
       dotenv:
         specifier: ^17.2.2
         version: 17.2.2
+      express:
+        specifier: ^5.1.0
+        version: 5.1.0
       uuid:
         specifier: ^11.1.0
         version: 11.1.0

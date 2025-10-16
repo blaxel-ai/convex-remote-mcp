@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getHeaders, getUrl } from "../utils";
+import { getHeaders, getUrl, withToolMiddleware } from "../utils";
 
 const inputSchema = {
   functionName: z
@@ -24,7 +24,7 @@ export const registerRun = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ functionName, args }, { _meta, requestInfo }) => {
+    withToolMiddleware("run", async ({ functionName, args }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo);
       const body = {
@@ -42,7 +42,7 @@ export const registerRun = (server: McpServer) => {
         content: [{ type: "text", text: JSON.stringify({ result: data?.value }) }],
         isError: false,
       };
-    },
+    }),
   );
 };
 

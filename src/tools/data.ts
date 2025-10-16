@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getHeaders, getUrl } from "../utils";
+import { getHeaders, getUrl, withToolMiddleware } from "../utils";
 
 const inputSchema = {
   tableName: z.string().describe("The name of the table to read from."),
@@ -30,7 +30,7 @@ export const registerData = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ tableName, order, cursor, limit }, { _meta, requestInfo }) => {
+    withToolMiddleware("data", async ({ tableName, order, cursor, limit }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo)
       const headers = getHeaders(_meta, requestInfo)
       const args = {
@@ -56,6 +56,6 @@ export const registerData = (server: McpServer) => {
         content: [{ type: "text", text: JSON.stringify(data.value) }],
         isError: false
       };
-    },
+    }),
   );
 };

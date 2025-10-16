@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { getConfigValue, getHeaders, getUrl } from "../utils";
+import { getConfigValue, getHeaders, getUrl, withToolMiddleware } from "../utils";
 
 const inputSchema = {
   query: z
@@ -19,7 +19,7 @@ export const registerRunOneoffQuery = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async ({ query }, { _meta, requestInfo }) => {
+    withToolMiddleware("runOneoffQuery", async ({ query }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo);
       const response = await fetch(`${baseUrl}/api/run_test_function`, {
@@ -49,7 +49,7 @@ export const registerRunOneoffQuery = (server: McpServer) => {
         content: [{ type: "text", text: JSON.stringify({ result: result.value, logLines: result.logLines }) }],
         isError: false,
       };
-    },
+    }),
   );
 };
 

@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getHeaders, getUrl } from "../utils";
+import { getHeaders, getUrl, withToolMiddleware } from "../utils";
 
 const listInput = {};
 const getInput = {
@@ -20,7 +20,7 @@ export const registerEnv = (server: McpServer) => {
   server.registerTool(
     "envList",
     { description: "List environment variables", inputSchema: listInput },
-    async (_args, { _meta, requestInfo }) => {
+    withToolMiddleware("envList", async (_args, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
@@ -34,14 +34,14 @@ export const registerEnv = (server: McpServer) => {
         headers,
       });
       return { content: [{ type: "text", text: JSON.stringify({ variables: data }) }], isError: false };
-    },
+    }),
   );
 
   // envGet
   server.registerTool(
     "envGet",
     { description: "Get an environment variable", inputSchema: getInput },
-    async ({ name }, { _meta, requestInfo }) => {
+    withToolMiddleware("envGet", async ({ name }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
@@ -55,14 +55,14 @@ export const registerEnv = (server: McpServer) => {
         headers,
       });
       return { content: [{ type: "text", text: JSON.stringify({ value: data?.value ?? null }) }], isError: false };
-    },
+    }),
   );
 
   // envSet
   server.registerTool(
     "envSet",
     { description: "Set an environment variable", inputSchema: setInput },
-    async ({ name, value }, { _meta, requestInfo }) => {
+    withToolMiddleware("envSet", async ({ name, value }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
@@ -79,14 +79,14 @@ export const registerEnv = (server: McpServer) => {
       });
       const success = !(data && data.status === "error");
       return { content: [{ type: "text", text: JSON.stringify({ success }) }], isError: !success };
-    },
+    }),
   );
 
   // envRemove
   server.registerTool(
     "envRemove",
     { description: "Remove an environment variable", inputSchema: removeInput },
-    async ({ name }, { _meta, requestInfo }) => {
+    withToolMiddleware("envRemove", async ({ name }, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo)
       const { data } = await convexFetch<any, any>({
@@ -102,7 +102,7 @@ export const registerEnv = (server: McpServer) => {
       });
       const success = !(data && data.status === "error");
       return { content: [{ type: "text", text: JSON.stringify({ success }) }], isError: !success };
-    },
+    }),
   );
 };
 

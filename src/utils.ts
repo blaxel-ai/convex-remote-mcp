@@ -1,4 +1,5 @@
 import { IsomorphicHeaders, RequestInfo, RequestMeta } from "@modelcontextprotocol/sdk/types.js"
+import { startSpan } from "@blaxel/core";
 
 /**
  * Helper function to get a value based on priority: meta > headers > env
@@ -89,4 +90,56 @@ export function getHeaders(meta: RequestMeta, requestInfo: RequestInfo): Record<
   }
 
   throw new Error("ADMIN_ACCESS_TOKEN or DEPLOYMENT_KEY environment variable is required");
+}
+
+/**
+ * Middleware that wraps MCP tool handlers with logging and telemetry
+ */
+export function withToolMiddleware<TArgs extends Record<string, any>, TContext extends { _meta?: RequestMeta; requestInfo?: RequestInfo }>(
+  toolName: string,
+  handler: (args: TArgs, context: TContext) => Promise<{ content: any[]; isError: boolean }>
+): (args: TArgs, context: TContext) => Promise<{ content: any[]; isError: boolean }> {
+  return async (args: TArgs, context: TContext) => {
+    const startTime = Date.now();
+
+    console.log(`[MCP Tool] ${toolName} called`, {
+      timestamp: new Date().toISOString(),
+      args: JSON.stringify(args),
+    });
+
+    const span = startSpan(`mcp.tool.${toolName}`);
+    try {
+      const result = await handler(args, context);
+      const duration = Date.now() - startTime;
+
+      span.setAttribute("tool.success", !result.isError);
+      span.setAttribute("tool.duration_ms", duration);
+
+        console.log(`[MCP Tool] ${toolName} completed`, {
+          timestamp: new Date().toISOString(),
+          duration_ms: duration,
+          success: !result.isError,
+        });
+
+        span.end();
+        return result;
+      } catch (error) {
+        const duration = Date.now() - startTime;
+
+        span.recordException(error as Error);
+        span.setAttribute("tool.success", false);
+        span.setAttribute("tool.duration_ms", duration);
+        span.setAttribute("tool.error", (error as Error).message);
+
+        console.error(`[MCP Tool] ${toolName} failed`, {
+          timestamp: new Date().toISOString(),
+          duration_ms: duration,
+          error: (error as Error).message,
+          stack: (error as Error).stack,
+        });
+
+        span.end();
+        throw error;
+      }
+  };
 }

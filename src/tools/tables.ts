@@ -1,7 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { convexFetch } from "../client";
-import { getHeaders, getUrl } from "../utils";
+import { getHeaders, getUrl, withToolMiddleware } from "../utils";
 
 const inputSchema = {};
 
@@ -16,7 +16,7 @@ export const registerTables = (server: McpServer) => {
       description,
       inputSchema,
     },
-    async (_args, { _meta, requestInfo }) => {
+    withToolMiddleware("tables", async (_args, { _meta, requestInfo }) => {
       const baseUrl = getUrl(_meta, requestInfo);
       const headers = getHeaders(_meta, requestInfo);
       // Fetch declared (active) schema via system function
@@ -79,7 +79,7 @@ export const registerTables = (server: McpServer) => {
         content: [{ type: "text", text: JSON.stringify({ tables: result }) }],
         isError: false,
       };
-    },
+    }),
   );
 };
 

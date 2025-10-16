@@ -10,7 +10,6 @@ export function getConfigValue(
   envKey: string,
   headers: IsomorphicHeaders = {}
 ): string | undefined {
-  console.log("getConfigValue", metaValue, headerKey, envKey, headers);
   // Priority order: meta > headers > env
   if (metaValue) {
     return metaValue as string;

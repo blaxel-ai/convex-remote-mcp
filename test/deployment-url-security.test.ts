@@ -65,4 +65,23 @@ describe("deployment URL security", () => {
       await Promise.all([close(attackerServer), close(trustedServer)]);
     }
   }, 30000);
+
+  it.each([
+    "attacker.example/?",
+    "trusted.convex.cloud@attacker.example/?",
+  ])("rejects a deploymentName that escapes convex.cloud: %s", (deploymentName) => {
+    vi.stubEnv("DEPLOYMENT_NAME", "");
+    vi.stubEnv("DEPLOYMENT_URL", "");
+
+    expect(() => getUrl({ deploymentName })).toThrow("Invalid deployment name");
+  });
+
+  it("preserves valid deploymentName routing", () => {
+    vi.stubEnv("DEPLOYMENT_NAME", "");
+    vi.stubEnv("DEPLOYMENT_URL", "");
+
+    expect(getUrl({ deploymentName: "enduring-monitor-130" })).toBe(
+      "https://enduring-monitor-130.convex.cloud",
+    );
+  });
 });

@@ -18,5 +18,10 @@ export function getUrl(meta: RequestMeta): string {
     return process.env.DEPLOYMENT_URL
   }
   const deploymentName = getDeploymentName(meta)
-  return `https://${deploymentName}.convex.cloud`
+  const expectedHostname = `${deploymentName}.convex.cloud`.toLowerCase()
+  const url = new URL(`https://${deploymentName}.convex.cloud`)
+  if (url.hostname !== expectedHostname) {
+    throw new Error("Invalid deployment name")
+  }
+  return url.origin
 }
